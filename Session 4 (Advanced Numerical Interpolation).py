@@ -51,15 +51,18 @@ print("error = ", abs(actual - test2))
 
 
 def Derivative(x, xn, yn, k):
+    xi = np.where(xn == x)[0][0]
+    
     def Solver(x, xn, yn, k, forwards):
+        h = xn[1] - xn[0]
+        xi = np.where(xn == x)[0][0]
         if k == 1:
             return (yn[xi + forwards] - yn[xi + forwards - 1]) / h
         else:
             a = Solver(x + h*forwards, xn, yn, k - 1, forwards=forwards)
             b = Solver(x + h*forwards - h, xn, yn, k - 1, forwards=forwards)
             return (a - b) / h
-    h = xn[1] - xn[0]
-    xi = np.where(xn == x)[0][0]
+            
     if xi < k:
         return Solver(x, xn, yn, k, forwards=True)
     else:  # default = backwards: more realistic for this situation as the future is not known
