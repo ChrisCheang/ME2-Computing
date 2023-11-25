@@ -55,8 +55,8 @@ def Derivative(x, xn, yn, k):
         if k == 1:
             return (yn[xi + forwards] - yn[xi + forwards - 1]) / h
         else:
-            a = Solver(x + forwards, xn, yn, k - 1, forwards=forwards)
-            b = Solver(x + forwards - h, xn, yn, k - 1, forwards=forwards)
+            a = Solver(x + h*forwards, xn, yn, k - 1, forwards=forwards)
+            b = Solver(x + h*forwards - h, xn, yn, k - 1, forwards=forwards)
             return (a - b) / h
     h = xn[1] - xn[0]
     xi = np.where(xn == x)[0][0]
