@@ -200,7 +200,7 @@ for i in range(len(xn)):
 
 #'''
 
-def Splines(x, xn, yn, a, b):
+def Splines_clamped(x, xn, yn, a, b):
     n = len(xn)
     h = xn[1] - xn[0]
     A = np.zeros((n, n))
