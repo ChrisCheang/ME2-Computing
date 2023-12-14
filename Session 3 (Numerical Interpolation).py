@@ -232,9 +232,9 @@ def Splines_clamped(x, xn, yn, a, b):
 
 ynl = []
 for i in range(len(xl)):
-    ynl.append(Splines(xl[i], xn, yn, a, b))
+    ynl.append(Splines_clamped(xl[i], xn, yn, a, b))
 
-print("Splines interp at x = 0.8 -->", Splines(0.8, xn, yn, a, b))
+print("Splines interp at x = 0.8 -->", Splines_clamped(0.8, xn, yn, a, b))
 
 plt.plot(xl, yl)
 plt.plot(xl, ynl)
