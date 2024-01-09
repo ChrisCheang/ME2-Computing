@@ -25,9 +25,9 @@ def myobebc_dirichlet(f, a, b, ya, yb, N):
     A[0][0], A[-1][-1] = 1, 1
     p[0], p[-1] = ya, yb
     for i in range(1, N):
-        ai = 1 / h ** 2 - f(x[i])[0]
-        bi = f(x[i])[1] - 2 / h**2
-        ci = 1 / h**2 + f(x[i])[0]/(2*h)
+        ai = 1 / (h ** 2) - f(x[i])[0] / (2 * h)
+        bi = f(x[i])[1] - 2 / (h ** 2)
+        ci = 1 / (h ** 2) + f(x[i])[0] / (2 * h)
         abci = [ai, bi, ci]
         A[i][i-1:i+2] = abci[0:3]
         p[i] = f(x[i])[2]
@@ -77,11 +77,8 @@ def myobebc(f, a, b, bca, bcb, N, R):
         ai = 1 / (h ** 2) - f(x[i])[0] / (2 * h)
         bi = f(x[i])[1] - 2 / (h ** 2)
         ci = 1 / (h ** 2) + f(x[i])[0] / (2 * h)
-        #abci = [ai, bi, ci]
-        #A[i][i-1:i+2] = abci[0:3]
-        A[i][i-1] = ai
-        A[i][i] = bi
-        A[i][i+1] = ci
+        abci = [ai, bi, ci]
+        A[i][i-1:i+2] = abci[0:3]
         p[i] = f(x[i])[2]
     y = np.matmul(np.linalg.inv(A), p)
     return x, y.flatten()
@@ -104,22 +101,21 @@ plt.show()
 
 h = 6 * 10 ** 4
 k = 16.75
-R = 15
-w = 3
+R = 0.015    # must be in m!
+w = 0.003
 T_w = 473
 
 
 def temp_ode(x):
     # returns (f(x), g(x), p(x)) in form y'' + f(x)y' + g(x)y = p(x))
-    return k/x, 0, -10 ** 8 * e ** (-x/R) / x
+    return 1/x, 0, - (10 ** 8) * e ** (-x/R) / (x * k)
 
 
 #'''
-C_1 = myobebc(temp_ode, R, R+w, - 6.32 * 10 ** 5 / k, h * T_w / k, 1000, [0, 1, 1, h/k])
-#print(C_1)
+C_1 = myobebc(temp_ode, R, R+w, - 6.32 * 10 ** 5 / k, h * T_w / k, 50, [1, 0, 1, h/k])
 
 plt.plot(C_1[0], C_1[1])
-plt.xlabel("radius (mm)")
+plt.xlabel("radius (m)")
 plt.ylabel("temp (K)")
 plt.show()
 #'''
