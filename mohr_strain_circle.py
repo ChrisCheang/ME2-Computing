@@ -49,9 +49,16 @@ class Rosette:
         theta1 = self.thetaa-self.thetab
         theta2 = self.thetac-self.thetab
 
-        pointA = Point(self.str1, (self.str2 - self.str1)/tan(theta1))
+        switcha = abs(cos(theta1))/cos(theta1)
+        switchc = abs(cos(theta2))/cos(theta2)
+
+        print(theta1)
+        print(theta2)
+
+
+        pointA = Point(self.str1, switcha*(self.str2 - self.str1)/tan(theta1))
         pointB = Point(self.str2, 0)
-        pointC = Point(self.str3, (self.str2 - self.str3)/tan(theta2))
+        pointC = Point(self.str3, switchc*(self.str2 - self.str3)/tan(theta2))
 
         segmentA = Segment(pointA,pointB)
         segmentB = Segment(pointB,pointC)
@@ -59,25 +66,24 @@ class Rosette:
         perpBisecA = segmentA.perpendicular_bisector() 
         perpBisecB = segmentB.perpendicular_bisector() 
 
-        O = perpBisecA.intersection(perpBisecB)
+        O = perpBisecA.intersection(perpBisecB)[0]
 
-        yoffset = -O[0].y
+        yoffset = -O.y
 
-
-        plt.plot([self.str2,self.str1],[yoffset, yoffset + (self.str2 - self.str1)/tan(theta1)], color = "black", linestyle="--")
-        plt.plot([self.str2,self.str3],[yoffset, yoffset + (self.str2 - self.str3)/tan(theta2)], color = "black", linestyle="--")
+        plt.plot([self.str2,self.str1],[yoffset, yoffset + pointA.y], color = "black", linestyle="--")
+        plt.plot([self.str2,self.str3],[yoffset, yoffset + pointC.y], color = "black", linestyle="--")
         
-        Amid = [0.5*(self.str2 + self.str1),0.5*(yoffset + yoffset + (self.str2 - self.str1)/tan(theta1))]
-        Bmid = [0.5*(self.str2 + self.str3),0.5*(yoffset + yoffset + (self.str2 - self.str3)/tan(theta2))]
+        Amid = [0.5*(self.str2 + self.str1),0.5*(2 * yoffset + pointA.y)]
+        Bmid = [0.5*(self.str2 + self.str3),0.5*(2 * yoffset + pointC.y)]
 
-        plt.plot([Amid[0],O[0].x],[Amid[1],0], color = "green", linestyle="--")
-        plt.plot([Bmid[0],O[0].x],[Bmid[1],0], color = "green", linestyle="--")
+        plt.plot([Amid[0],O.x],[Amid[1],0], color = "green", linestyle="--")
+        plt.plot([Bmid[0],O.x],[Bmid[1],0], color = "green", linestyle="--")
 
         theta = np.linspace( 0 , 2 * np.pi , 150 )
  
-        radius = O[0].distance(pointA.midpoint(pointB))
+        radius = O.distance(pointA.midpoint(pointB))
  
-        a = radius * np.cos( theta ) + O[0].x
+        a = radius * np.cos( theta ) + O.x
         b = radius * np.sin( theta )
 
         plt.plot(a,b)
@@ -93,12 +99,12 @@ strains = [volt_to_strain_gauge(milliVolts[i]) for i in range(3)]
 angles = [0 + 20*pi/180,pi/4 + 20*pi/180,pi/2 + 20*pi/180]
 
 
-rosettetest = Rosette(0,4*pi/3,2*pi/3,108,90,64)   # from tutorial sheet, exposes the BA and CA segment always pointing up problem - fix later
-rosettetest2 = Rosette(0,pi/3,135*pi/180,300,130,-50)   # from notes, works as angle differences less than 90
+rosettetest = Rosette(0,4*pi/3,2*pi/3,108,90,64)   
+rosettetest2 = Rosette(0,pi/3,135*pi/180,300,130,-50)   
 rosette789 = Rosette(angles[0],angles[1],angles[2],strains[2],strains[1],strains[0])
 
 
-#rosettetest.draw_mohr_circle()
-rosette789.draw_mohr_circle()
+rosettetest.draw_mohr_circle()
+#rosette789.draw_mohr_circle()
 
-print(rosette789.solve())
+#print(rosette789.solve())
