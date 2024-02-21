@@ -6,13 +6,15 @@ import matplotlib.pyplot as plt
 from sympy import Point, Segment
 
 
+def volt_to_strain_gauge(mVolt):
+    return mVolt*1000*4/(2.1*2.5)
+
+
 class Rosette:
+
     def __init__(self, theta1, theta2, theta3, str1, str2, str3):
         if (str1 < str2 and str3 < str2) or (str1 > str2 and str3 > str2):
             print("Make sure strain 2 is the interim strain")
-            return
-        if theta1 > theta2 or theta2 > theta3 or theta1 > theta3:
-            print("Make sure angles are in increasing order")
             return
         self.thetaa = theta1
         self.thetab = theta2
@@ -33,6 +35,12 @@ class Rosette:
         sol = np.matmul(np.linalg.inv(M),s)
         return [sol[i,0] for i in range(3)]
     
+    def solve_principal(self):
+        e1 = 0.5*(self.solve()[0] + self.solve()[1]) + 0.5*sqrt((self.solve()[0] - self.solve()[1])**2 + self.solve()[2]**2)
+        e2 = 0.5*(self.solve()[0] + self.solve()[1]) - 0.5*sqrt((self.solve()[0] - self.solve()[1])**2 + self.solve()[2]**2)
+
+        return [e1,e2]
+    
     def draw_mohr_circle(self):
         plt.axvline(x=self.str1, linestyle="--")
         plt.axvline(x=self.str2, linestyle="--")
@@ -41,7 +49,7 @@ class Rosette:
         theta1 = self.thetaa-self.thetab
         theta2 = self.thetac-self.thetab
 
-        pointA = Point(self.str1,(self.str2 - self.str1)/tan(theta1))
+        pointA = Point(self.str1, (self.str2 - self.str1)/tan(theta1))
         pointB = Point(self.str2, 0)
         pointC = Point(self.str3, (self.str2 - self.str3)/tan(theta2))
 
@@ -55,21 +63,42 @@ class Rosette:
 
         yoffset = -O[0].y
 
+
         plt.plot([self.str2,self.str1],[yoffset, yoffset + (self.str2 - self.str1)/tan(theta1)], color = "black", linestyle="--")
         plt.plot([self.str2,self.str3],[yoffset, yoffset + (self.str2 - self.str3)/tan(theta2)], color = "black", linestyle="--")
-
+        
         Amid = [0.5*(self.str2 + self.str1),0.5*(yoffset + yoffset + (self.str2 - self.str1)/tan(theta1))]
         Bmid = [0.5*(self.str2 + self.str3),0.5*(yoffset + yoffset + (self.str2 - self.str3)/tan(theta2))]
 
-        plt.plot([Amid[0],O[0].x],[Amid[1],0])
-        plt.plot([Bmid[0],O[0].x],[Bmid[1],0])
+        plt.plot([Amid[0],O[0].x],[Amid[1],0], color = "green", linestyle="--")
+        plt.plot([Bmid[0],O[0].x],[Bmid[1],0], color = "green", linestyle="--")
+
+        theta = np.linspace( 0 , 2 * np.pi , 150 )
+ 
+        radius = O[0].distance(pointA.midpoint(pointB))
+ 
+        a = radius * np.cos( theta ) + O[0].x
+        b = radius * np.sin( theta )
+
+        plt.plot(a,b)
 
         plt.axis('square')
         plt.show()
 
 
-rosette789 = Rosette(0,pi/3,135*pi/180,300,130,-50)
+milliVolts = [-0.05919,-0.04729,0.35239]
+
+strains = [volt_to_strain_gauge(milliVolts[i]) for i in range(3)]
+
+angles = [0 + 20*pi/180,pi/4 + 20*pi/180,pi/2 + 20*pi/180]
 
 
+rosettetest = Rosette(0,4*pi/3,2*pi/3,108,90,64)   # from tutorial sheet, exposes the BA and CA segment always pointing up problem - fix later
+rosettetest2 = Rosette(0,pi/3,135*pi/180,300,130,-50)   # from notes, works as angle differences less than 90
+rosette789 = Rosette(angles[0],angles[1],angles[2],strains[2],strains[1],strains[0])
+
+
+#rosettetest.draw_mohr_circle()
 rosette789.draw_mohr_circle()
 
+print(rosette789.solve())
