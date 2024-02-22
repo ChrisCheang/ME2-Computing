@@ -110,7 +110,7 @@ class Rosette:
 
         theta = np.linspace( 0 , 2 * np.pi , 150 )
  
-        radius = O.distance(pointA.midpoint(pointB))
+        radius = O.distance(pointA)
  
         a = radius * np.cos( theta ) + O.x
         b = radius * np.sin( theta )
