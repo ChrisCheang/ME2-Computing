@@ -47,9 +47,9 @@ class Rosette:
 
         plt.axvline(x=0, color="black", linestyle="-", linewidth=0.8)
 
-        plt.axvline(x=self.str1, linestyle="--", linewidth=0.8)
-        plt.axvline(x=self.str2, linestyle="--", linewidth=0.8)
-        plt.axvline(x=self.str3, linestyle="--", linewidth=0.8)
+        #plt.axvline(x=self.str1, linestyle="--", linewidth=0.8)
+        #plt.axvline(x=self.str2, linestyle="--", linewidth=0.8)
+        #plt.axvline(x=self.str3, linestyle="--", linewidth=0.8)
 
         #plt.annotate('gauge 7 = -47.9', xy=(self.str1, 100), xytext=(self.str1 + 100, 200), arrowprops=dict(arrowstyle="->", facecolor='black'))
         #plt.annotate('gauge 8 = -34.0', xy=(self.str2, 100), xytext=(self.str2 + 100, 100), arrowprops=dict(arrowstyle="->", facecolor='black'))
@@ -62,8 +62,8 @@ class Rosette:
         theta1 = self.thetaa-self.thetab
         theta2 = self.thetac-self.thetab
 
-        switcha = -abs(cos(theta1))/cos(theta1)       # this bit is a quick fix that doesn't really work all the time - fix later
-        switchc = -abs(cos(theta2))/cos(theta2)
+        switcha = abs(cos(theta1))/cos(theta1)       # this bit is a quick fix that doesn't really work all the time - fix later
+        switchc = abs(cos(theta2))/cos(theta2)
 
 
         pointA = Point(self.str1, switcha*(self.str2 - self.str1)/tan(theta1))
@@ -126,12 +126,12 @@ class Rosette:
 
         plt.axis('square')
         
-        #plt.plot([pointC.x],[pointC.y - O.y], 'ro')
+        plt.plot([pointA.x],[pointA.y - O.y], 'ro')
 
-        thetaOC = atan2(pointC.y - O.y,pointC.x - O.x)
+        thetaOC = atan2(pointA.y - O.y,pointA.x - O.x)
 
         plt.plot([radius * np.cos( thetaOC - 40*pi/180) + O.x], [radius * np.sin( thetaOC - 40*pi/180)], 'ro')
-
+        plt.plot([radius * np.cos( pi+thetaOC - 40*pi/180) + O.x], [radius * np.sin( pi+thetaOC - 40*pi/180)], 'bo')
     
         plt.annotate('O', xy=(O.x, 0), xytext=(O.x - 50, 10), arrowprops=dict(arrowstyle="->", facecolor='black'))
 
@@ -143,26 +143,29 @@ class Rosette:
         a = 100 * np.cos( theta) + O.x
         b = 100 * np.sin( theta)
 
-
-        #plt.plot(a,b, color="black", linewidth=0.5)
-
-
-        #plt.plot([O.x,pointC.x],[0,pointC.y - O.y], color="black", linewidth=0.5)
-        #plt.plot([O.x,radius*np.cos(thetaOC - 40*pi/180) + O.x],[0,radius*np.sin(thetaOC - 40*pi/180)], color="black", linewidth=0.5)
+        plt.plot(a,b, color="black", linewidth=0.5)
 
 
-        #plt.annotate('Clockwise by 2 x 20 deg to get to x direction from gauge 9', xy=(O.x+80,50), xytext=(0, -100), arrowprops=dict(arrowstyle="->", facecolor='black'))
+        plt.plot([O.x,pointA.x],[0,pointA.y - O.y], color="black", linewidth=0.5)
+        plt.plot([O.x,radius*np.cos(thetaOC - 40*pi/180) + O.x],[0,radius*np.sin(thetaOC - 40*pi/180)], color="black", linewidth=0.5)
 
-
-        #plt.axvline(x=radius * np.cos( thetaOC - 40*pi/180) + O.x, color="green", linestyle="--", linewidth=0.8)
+        plt.plot([O.x,radius*np.cos(pi+thetaOC - 40*pi/180) + O.x],[0,radius*np.sin(pi+thetaOC - 40*pi/180)], color="black", linewidth=0.5)
 
         #plt.annotate('Clockwise by 2 x 20 deg to get to x direction from gauge 9', xy=(O.x+80,50), xytext=(0, -100), arrowprops=dict(arrowstyle="->", facecolor='black'))
 
 
+        plt.axvline(x=radius * np.cos( thetaOC - 40*pi/180) + O.x, color="green", linestyle="--", linewidth=0.8)
+
+        plt.annotate('ex = 320.9', xy=(radius * np.cos( thetaOC - 40*pi/180) + O.x,-100), xytext=(100, -150), arrowprops=dict(arrowstyle="->", facecolor='black'))
+
+        plt.axvline(x=radius * np.cos( pi + thetaOC - 40*pi/180) + O.x, color="green", linestyle="--", linewidth=0.8)
+
+        plt.annotate('ey = -103.1', xy=(radius * np.cos( pi+thetaOC - 40*pi/180) + O.x,-100), xytext=(100, -50), arrowprops=dict(arrowstyle="->", facecolor='black'))
 
 
+        plt.axhline(y=radius * np.sin( thetaOC - 40*pi/180), color="green", linestyle="--", linewidth=0.8)
 
-
+        plt.annotate('es = 2 x -8.65 = -17.3', xy=(20,10), xytext=(10, 80), arrowprops=dict(arrowstyle="->", facecolor='black'))
 
 
         
@@ -182,7 +185,7 @@ angles = [0 + offset,pi/4 + offset,pi/2 + offset]
 rosettetest = Rosette(0,4*pi/3,2*pi/3,108,90,64)   
 rosettetest2 = Rosette(0,pi/3,135*pi/180,300,130,-50)   
 rosettetest3 = Rosette(0,pi/3,135*pi/180,300,130,-50)   
-rosette789 = Rosette(angles[0],angles[1],angles[2],strains[0],strains[1],strains[2])
+rosette789 = Rosette(angles[0],angles[1],angles[2],strains[2],strains[1],strains[0])
 
 
 #rosettetest.draw_mohr_circle()
