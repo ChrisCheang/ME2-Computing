@@ -49,7 +49,7 @@ U[:,0,:], U[:,-1,:] = 0, 0
 #
 
 # point central perterbation version
-U[:,int(nx/2),int(ny/2)] = [2*sin(0.09*i) for i in range(nt)]   # oscillating point at the centre
+U[:,int(nx/2),int(ny/2)] = [2*sin(0.13*i) for i in range(nt)]   # oscillating point at the centre
 
 
 # In this section I am implementing the numerical methode
