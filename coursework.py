@@ -79,26 +79,50 @@ for i in range(int(t_end / k) + 1):
             break  # finishing the loop
 '''
 
-#testing surface plot
-
-
 
 #'''
-ax = plt.axes(projection='3d')   # comment this away for contour plots
-for i in range(int(t_end / k) + 1):   
-    ax.plot_surface(Xg,Yg,U[i,:,:])
-    ax.plot_surface(Xg,Yg,U[i,:,:])
-    ax.set(xlim=(0, xb), ylim=(0, yb), zlim=(-3,3))
+fig = plt.figure()
+ax1 = fig.add_subplot(221, projection='3d')
+ax1.set_xlabel('X')
+ax1.set_ylabel('Y')
+ax1.set_zlabel('U')
+
+
+ax2 = fig.add_subplot(212)
+ax2.set_xlabel('X')
+ax2.set_ylabel('Y')
+
+ax3 = fig.add_subplot(223)
+ax3.set_xlabel('X')
+ax3.set_ylabel('Y')
+
+ax1.set_box_aspect([1, 1, 1])  # set aspect ratio of 3D plot
+ax2.set_aspect('equal')  # set aspect ratio of contour plot
+ax3.set_aspect('equal')  # set aspect ratio of colour plot
+
+# Plot color key (snapshot chosen in the middle of time range so we get the right max and mins - find more refined version)
+fig.colorbar(ax2.contour(Xg, Yg, U[int(nt/2)], cmap='viridis'), ax=ax2)
+
+for i in range(int(t_end / k) + 1):
+    ax1.clear()
+    ax2.clear()
+    ax3.clear()
+    ax1.plot_surface(Xg, Yg, U[i])
+    ax1.set_zlim([-2, 2])  # set the z-axis limits
+    ax2.contour(Xg, Yg, U[i], cmap='viridis')
+    ax3.imshow(U[i], interpolation='bilinear', norm=norm, extent=[0, xb, 0, yb])
+    #ax3.colorbars()
+
     plt.pause(0.000001)
-    plt.cla()
-    if keyboard.is_pressed('e'):  # if key 'q' is pressed 
-            print('Abort!')
-            break  # finishing the loop
-#'''
     
 
 
+    if keyboard.is_pressed('e'):  # if key 'q' is pressed 
+        plt.close()
+        print('Abort!')
+        break  # finishing the loop
+    
 
-# In this section I am celebrating
-print('CW done: I deserve a good mark')
+plt.show()
 
+#'''
