@@ -61,12 +61,12 @@ for t in range(2, nt):
                     uxx = (1/hx**2) * (U[t-1,x+1,y] - 2*U[t-1,x,y] + U[t-1,x-1,y])
                     uyy = (1/hy**2) * (U[t-1,x,y+1] - 2*U[t-1,x,y] + U[t-1,x,y-1])
                     U[t,x,y] = 2*U[t-1,x,y] - U[t-2,x,y] + k**2*c**2*uxx + k**2*c**2*uyy
-                #U[t,x,y] = (t*c/(hx*hy)) * (U[t-1,x-1,y] + U[t-1,x+1,y] + U[t-1,x,y-1] + U[t-1,x,y+1] - 4*U[t-1,x,y]) + 2*U[t-1,x,y] - U[t-2,x,y]
+                    #U[t,x,y] = (t*c/(hx*hy)) * (U[t-1,x-1,y] + U[t-1,x+1,y] + U[t-1,x,y-1] + U[t-1,x,y+1] - 4*U[t-1,x,y]) + 2*U[t-1,x,y] - U[t-2,x,y]
 
 
 # In this section I am showing the results
 
-norm = matplotlib.colors.Normalize(vmin=-1, vmax=1)
+norm = matplotlib.colors.Normalize(vmin=-2, vmax=2)
 
 '''
 for i in range(int(t_end / k) + 1):
@@ -87,7 +87,6 @@ ax1.set_xlabel('X')
 ax1.set_ylabel('Y')
 ax1.set_zlabel('U')
 
-
 ax2 = fig.add_subplot(212)
 ax2.set_xlabel('X')
 ax2.set_ylabel('Y')
@@ -101,21 +100,19 @@ ax2.set_aspect('equal')  # set aspect ratio of contour plot
 ax3.set_aspect('equal')  # set aspect ratio of colour plot
 
 # Plot color key (snapshot chosen in the middle of time range so we get the right max and mins - find more refined version)
-fig.colorbar(ax2.contour(Xg, Yg, U[int(nt/2)], cmap='viridis'), ax=ax2)
+fig.colorbar(ax2.contour(Xg, Yg, U[int(nt/2)], cmap='rainbow'), ax=ax2)
 
 for i in range(int(t_end / k) + 1):
     ax1.clear()
     ax2.clear()
     ax3.clear()
-    ax1.plot_surface(Xg, Yg, U[i])
+    ax1.plot_surface(Xg, Yg, U[i], cmap='rainbow', vmin=-2, vmax=2)
     ax1.set_zlim([-2, 2])  # set the z-axis limits
-    ax2.contour(Xg, Yg, U[i], cmap='viridis')
-    ax3.imshow(U[i], interpolation='bilinear', norm=norm, extent=[0, xb, 0, yb])
+    ax2.contour(Xg, Yg, U[i], cmap='rainbow', vmin=-2, vmax=2)
+    ax3.imshow(U[i], interpolation='bilinear', norm=norm, extent=[0, xb, 0, yb], origin='lower', cmap='rainbow')
     #ax3.colorbars()
 
     plt.pause(0.000001)
-    
-
 
     if keyboard.is_pressed('e'):  # if key 'q' is pressed 
         plt.close()
