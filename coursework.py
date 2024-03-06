@@ -99,17 +99,19 @@ ax1.set_box_aspect([1, 1, 1])  # set aspect ratio of 3D plot
 ax2.set_aspect('equal')  # set aspect ratio of contour plot
 ax3.set_aspect('equal')  # set aspect ratio of colour plot
 
+colour = 'coolwarm'
+
 # Plot color key (snapshot chosen in the middle of time range so we get the right max and mins - find more refined version)
-fig.colorbar(ax2.contour(Xg, Yg, U[int(nt/2)], cmap='rainbow'), ax=ax2)
+fig.colorbar(ax2.contour(Xg, Yg, U[int(nt/2)], cmap=colour), ax=ax2)
 
 for i in range(int(t_end / k) + 1):
     ax1.clear()
     ax2.clear()
     ax3.clear()
-    ax1.plot_surface(Xg, Yg, U[i], cmap='rainbow', vmin=-2, vmax=2)
+    ax1.plot_surface(Xg, Yg, U[i], cmap=colour, vmin=-2, vmax=2)
     ax1.set_zlim([-2, 2])  # set the z-axis limits
-    ax2.contour(Xg, Yg, U[i], cmap='rainbow', vmin=-2, vmax=2)
-    ax3.imshow(U[i], interpolation='bilinear', norm=norm, extent=[0, xb, 0, yb], origin='lower', cmap='rainbow')
+    ax2.contour(Xg, Yg, U[i], cmap=colour, vmin=-2, vmax=2)
+    ax3.imshow(U[i], interpolation='bilinear', norm=norm, extent=[0, xb, 0, yb], origin='lower', cmap=colour)
     #ax3.colorbars()
 
     plt.pause(0.000001)
