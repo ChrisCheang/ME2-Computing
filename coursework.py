@@ -1,0 +1,68 @@
+# In this section I am importing all the libraries I will need
+import math
+from math import *
+import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
+
+
+
+# In this section I am setting the domain of solution and the discretised grid
+
+xb = 1
+yb = 1 # xb and yb give the coordinates of the upper right corner of the bounding rectangle, with the origin being the other
+
+hx = 0.01 # step sizes and end time
+hy = 0.01
+k = 0.01
+t_end = 3
+
+nx = int(xb / hx) + 1
+ny = int(yb / hy) + 1
+nt = int(t_end / k) + 1
+
+c = 0.5
+
+
+# In this section I am defining arrays I would need (if needed)
+
+U = np.ndarray((nt, nx, ny))
+
+# In this section I am setting the boundary conditions/initial values
+
+# first version: square box bounding values
+
+U[0,:,:] = 0   # no initial displacement everywhere - boundary value in time
+U[1,:,:] = 0   # need another boundary condition for accel (should improve later!)
+U[:,:,0], U[:,:,-1] = 1, 0 # no displacement at the boundaries always
+U[:,0,:], U[:,-1,:] = 0, 0
+
+#U[:,int(nx/2),int(ny/2)] = [1*sin(i) for i in range(nt)]   # oscillating point at the centre
+
+# In this section I am implementing the numerical method
+
+for t in range(2, nt):
+        for x in range(1, nx-1):#[i for i in range(1, nx - 1) if i != int(nx/2)]:
+            for y in range(1, ny-1):#[i for i in range(1, ny - 1) if i != int(ny/2)]:
+                uxx = (1/hx**2) * (U[t-1,x+1,y] - 2*U[t-1,x,y] + U[t-1,x-1,y])
+                uyy = (1/hy**2) * (U[t-1,x,y+1] - 2*U[t-1,x,y] + U[t-1,x,y-1])
+                U[t,x,y] = 2*U[t-1,x,y] - U[t-2,x,y] + k**2*c**2*uxx + k**2*c**2*uyy
+
+
+# In this section I am showing the results
+
+norm = matplotlib.colors.Normalize(vmin=-1, vmax=1)
+
+#'''
+for i in range(int(t_end / k) + 1):
+    plt.imshow(U[i], interpolation='bilinear', norm=norm)
+    plt.colorbar()
+    plt.pause(0.000001)
+    plt.clf()
+#'''
+
+print(U[:,int(nx/2)+1,int(ny/2)+1])
+
+# In this section I am celebrating
+print('CW done: I deserve a good mark')
+
