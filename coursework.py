@@ -143,8 +143,18 @@ class Plate:
 
         #'''
 
+
 test_plate = Plate(1,1,0.02,0.02,15,0.03/pi,0.5)
 test_plate.visualise()
+
+
+tau = 69*10**9
+rho = 2500
+cs = sqrt(tau/rho)
+freq = 400
+
+test_plate_2 = Plate(xb=1,yb=1,h=0.02,k=0.000e5/freq,t_end=2/freq,freq=freq,c=cs)
+
 
 
 
