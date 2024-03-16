@@ -7,6 +7,17 @@ import matplotlib.pyplot as plt
 
 import keyboard  # just so erronous plots can be stopped more QUICKLy
 
+class Plate:
+     def __init__(self, xb, yb, hx, hy, k, t_end):
+          self.xb = xb
+          self.yb = yb
+          self.hx = hx
+          self.hy = hy
+          self.k = k
+          self.t_end = t_end
+
+    
+          
 
 # In this section I am setting the domain of solution and the discretised grid
 
@@ -49,7 +60,7 @@ U[:,0,:], U[:,-1,:] = 0, 0
 #
 
 # point central perterbation version
-U[:,int(nx/2),int(ny/2)] = [2*sin(0.13*i) for i in range(nt)]   # oscillating point at the centre
+U[:,int(nx/2),int(ny/2)] = [2*sin(0.13*i) for i in range(20)] + [0 for i in range(nt-20)]   # oscillating point at the centre
 
 
 # In this section I am implementing the numerical methode
@@ -116,7 +127,7 @@ for i in range(int(t_end / k) + 1):
 
     plt.pause(0.000001)
 
-    if keyboard.is_pressed('e'):  # if key 'q' is pressed 
+    if keyboard.is_pressed('e'):  # if key 'e' is pressed 
         plt.close()
         print('Abort!')
         break  # finishing the loop
