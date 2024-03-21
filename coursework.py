@@ -16,7 +16,7 @@ import keyboard  # just so erronous plots can be stopped more QUICKLy
 
 
 class Plate:
-    def __init__(self, xb, yb, h, k, t_end, freq, c):
+    def __init__(self, xb, yb, h, k, t_end, freq, c,amp):
         self.xb = xb
         self.yb = yb
         self.h = h
@@ -24,7 +24,8 @@ class Plate:
         self.freq = freq
         self.t_end = t_end
         self.c = c
-
+        self.amp = amp
+        
         self.nx = int(xb / h) + 1
         self.ny = int(yb / h) + 1
         self.nt = int(t_end / k) + 1
@@ -56,10 +57,10 @@ class Plate:
         #        U[:,x,y] = [sin(0.1*i) for i in range(nt)]
         #
 
-        # point central perterbation version
-        U[:,int(self.nx/2),int(self.ny/2)] = [1*sin(2*pi*self.freq*i) for i in range(self.nt)]# + [0 for i in range(nt-20)]   # oscillating point at the centre
+       
 
 
+        U[:,int(self.nx/2),int(self.ny/2)] = [self.amp*sin(2*pi*self.freq*i) for i in range(self.nt)]# + [0 for i in range(nt-20)]   # oscillating point at the centre
         # In this section I am implementing the numerical method
 
         for t in range(2, self.nt):
@@ -70,6 +71,7 @@ class Plate:
                         uyy = (1/self.h**2) * (U[t-1,x,y+1] - 2*U[t-1,x,y] + U[t-1,x,y-1])
                         U[t,x,y] = 2*U[t-1,x,y] - U[t-2,x,y] + self.k**2*self.c**2*uxx + self.k**2*self.c**2*uyy
                         #U[t,x,y] = (t*c/(hx*hy)) * (U[t-1,x-1,y] + U[t-1,x+1,y] + U[t-1,x,y-1] + U[t-1,x,y+1] - 4*U[t-1,x,y]) + 2*U[t-1,x,y] - U[t-2,x,y]
+            
             U[t,0,:] = U[t,1,:]
             U[t,-1,:] = U[t,-2,:]
             U[t,:,0] = U[t,:,1]
@@ -119,18 +121,32 @@ class Plate:
 
         colour = 'coolwarm'
 
-        # Plot color key (snapshot chosen in the middle of time range so we get the right max and mins - find more refined version)
-        fig.colorbar(ax2.contour(Xg, Yg, U[int(self.nt/2)], cmap=colour), ax=ax2)
+ 
+
+  
+#calibrating the colour bar for a displacement snapshot at a certain time so as to co-incide with the maximum/minimum displacement
+
+        vmin = -self.amp
+        vmax = self.amp
+        
+        fig.colorbar(ax2.contour(Xg, Yg, U[int(self.nt/2)], cmap=colour, vmin=-2, vmax=2), ax=ax2)
+     
+
 
         for i in range(int(self.t_end / self.k) + 1):
             ax1.clear()
             ax2.clear()
             ax3.clear()
-            ax1.plot_surface(Xg, Yg, U[i], cmap=colour, vmin=-2, vmax=2)
+            ax1.plot_surface(Xg, Yg, U[i], cmap=colour, vmin=vmin, vmax=vmax)
             ax1.set_zlim([-2, 2])  # set the z-axis limits
-            ax2.contour(Xg, Yg, U[i], cmap=colour, vmin=-2, vmax=2)
+            #contour plot of 0 displacement
+            ax2.contour(Xg, Yg, U[i],levels=[0], cmap=colour, vmin=vmin, vmax=vmax)
+            
             ax3.imshow(U[i], interpolation='bilinear', norm=norm, extent=[0, self.xb, 0, self.yb], origin='lower', cmap=colour)
-            #ax3.colorbars()
+       
+            
+            
+
 
             plt.pause(0.000001)
 
@@ -138,13 +154,13 @@ class Plate:
                 plt.close()
                 print('Abort!')
                 break  # finishing the loop
-            
+        
         plt.show()
 
         #'''
 
 
-test_plate = Plate(1,1,0.02,0.02,15,0.03/pi,0.5)
+test_plate = Plate(1,1,0.02,0.02,15,0.03/pi,0.5,2)
 test_plate.visualise()
 
 
@@ -152,11 +168,7 @@ tau = 69*10**9
 rho = 2500
 cs = sqrt(tau/rho)
 freq = 400
+amp = 1
+k = 0.0001e5/freq
 
-test_plate_2 = Plate(xb=1,yb=1,h=0.02,k=0.000e5/freq,t_end=2/freq,freq=freq,c=cs)
-
-
-
-
-
-
+#test_plate_2 = Plate(xb=1, yb=1, h=0.02, k=0.02, t_end=2/freq, freq=freq, c=cs, amp=amp)
