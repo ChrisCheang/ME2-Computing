@@ -16,9 +16,8 @@ import keyboard  # just so erronous plots can be stopped more QUICKLy
 
 
 class Plate:
-    def __init__(self, xb, yb, h, k, t_end, freq, c,amp):
-        self.xb = xb
-        self.yb = yb
+    def __init__(self, L, h, k, t_end, freq, c,amp):
+        self.L = L
         self.h = h
         self.k = k
         self.freq = freq
@@ -26,13 +25,13 @@ class Plate:
         self.c = c
         self.amp = amp
         
-        self.nx = int(xb / h) + 1
-        self.ny = int(yb / h) + 1
+        self.nx = int(L / h) + 1
+        self.ny = self.nx
         self.nt = int(t_end / k) + 1
 
     def mesh(self):
-        x = np.arange(0,self.xb+self.h,self.h)  #meshgrid for surface
-        y = np.arange(0,self.yb+self.h,self.h)
+        x = np.arange(-self.L/2,self.L/2+self.h,self.h)  #meshgrid for surface
+        y = np.arange(-self.L/2,self.L/2+self.h,self.h)
 
         Xg, Yg = np.meshgrid(x, y)
         return (Xg, Yg)
@@ -47,9 +46,17 @@ class Plate:
         # first version: square box bounding values
 
         U[0,:,:] = 0   # no initial displacement everywhere - boundary value in time
+    
         U[1,:,:] = 0   # need another boundary condition for accel (should improve later!)
         #U[:,:,0], U[:,:,-1] = 0, 0 # no displacement at the boundaries always
         #U[:,0,:], U[:,-1,:] = 0, 0
+
+    
+        
+        
+
+
+
 
         # larger central perterbation version
         #for x in [i for i in range(1, nx-1) if sqrt((i-nx/2)**2) < 1]:
@@ -57,10 +64,9 @@ class Plate:
         #        U[:,x,y] = [sin(0.1*i) for i in range(nt)]
         #
 
-       
 
-
-        U[:,int(self.nx/2),int(self.ny/2)] = [self.amp*sin(2*pi*self.freq*i) for i in range(self.nt)]# + [0 for i in range(nt-20)]   # oscillating point at the centre
+        w = 2*pi*self.freq
+        U[:,int(self.nx/2),int(self.ny/2)] = [self.amp*sin(w*i) for i in range(self.nt)]# + [0 for i in range(nt-20)]   # oscillating point at the centre
         # In this section I am implementing the numerical method
 
         for t in range(2, self.nt):
@@ -86,7 +92,7 @@ class Plate:
         Xg = self.mesh()[0]
         Yg = self.mesh()[1]
 
-        norm = matplotlib.colors.Normalize(vmin=-2, vmax=2)
+        
 
         '''
         for i in range(int(t_end / k) + 1):
@@ -107,13 +113,17 @@ class Plate:
         ax1.set_ylabel('Y')
         ax1.set_zlabel('U')
 
-        ax2 = fig.add_subplot(212)
+
+        ax2 = fig.add_subplot(222)
         ax2.set_xlabel('X')
         ax2.set_ylabel('Y')
+        
+        
 
         ax3 = fig.add_subplot(223)
         ax3.set_xlabel('X')
         ax3.set_ylabel('Y')
+        
 
         ax1.set_box_aspect([1, 1, 1])  # set aspect ratio of 3D plot
         ax2.set_aspect('equal')  # set aspect ratio of contour plot
@@ -122,15 +132,13 @@ class Plate:
         colour = 'coolwarm'
 
  
-
-  
-#calibrating the colour bar for a displacement snapshot at a certain time so as to co-incide with the maximum/minimum displacement
-
         vmin = -self.amp
         vmax = self.amp
         
-        fig.colorbar(ax2.contour(Xg, Yg, U[int(self.nt/2)], cmap=colour, vmin=-2, vmax=2), ax=ax2)
-     
+        norm = matplotlib.colors.Normalize(vmin=-self.amp, vmax=self.amp)
+        
+        fig.colorbar(matplotlib.cm.ScalarMappable(norm=norm, cmap=colour), ax=ax3, orientation='vertical', label='Displacement (m)')
+      
 
 
         for i in range(int(self.t_end / self.k) + 1):
@@ -139,11 +147,14 @@ class Plate:
             ax3.clear()
             ax1.plot_surface(Xg, Yg, U[i], cmap=colour, vmin=vmin, vmax=vmax)
             ax1.set_zlim([-2, 2])  # set the z-axis limits
-            #contour plot of 0 displacement
-            ax2.contour(Xg, Yg, U[i],levels=[0], cmap=colour, vmin=vmin, vmax=vmax)
             
-            ax3.imshow(U[i], interpolation='bilinear', norm=norm, extent=[0, self.xb, 0, self.yb], origin='lower', cmap=colour)
-       
+            #contour plot of 0 displacement
+    
+            ax2.contour(Xg, Yg, U[i], levels=[0], cmap=colour, vmin=vmin, vmax=vmax)
+            ax2.set_title('Zero displacement')
+            
+            ax3.imshow(U[i], interpolation='bilinear', norm=norm, extent=[0, self.L, 0, self.L], origin='lower', cmap=colour)
+  
             
             
 
@@ -160,15 +171,33 @@ class Plate:
         #'''
 
 
-test_plate = Plate(1,1,0.02,0.02,15,0.03/pi,0.5,2)
+
+
+L = 1
+h = 0.02
+k = 0.02
+t_end = 15
+freq = 0.03/pi
+cs = 0.5
+amp = 1
+
+
+
+test_plate = Plate(L,h,k,t_end,freq,cs,amp)
 test_plate.visualise()
 
 
+'''
+
 tau = 69*10**9
 rho = 2500
-cs = sqrt(tau/rho)
+cs = 200
 freq = 400
 amp = 1
-k = 0.0001e5/freq
+k = 0.01/freq
 
-#test_plate_2 = Plate(xb=1, yb=1, h=0.02, k=0.02, t_end=2/freq, freq=freq, c=cs, amp=amp)
+chladni_plate = Plate(xb=0.5, yb=0.5, h=0.025, k=k, t_end=10/freq, freq=freq, c=cs, amp=amp)
+
+chladni_plate.visualise()
+
+'''
