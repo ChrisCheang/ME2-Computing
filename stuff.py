@@ -165,6 +165,7 @@ for j in range(2,nt):
 '''
 
 # Tutorial Sheet 13 1a) - explicit 1D wave equation with neumann bc
+'''
 
 def u_analytical(x,t):
     return cos(pi*x)*cos(pi*t)
@@ -218,3 +219,196 @@ u_error = np.zeros((nx,nt))
 for j in range(0,nt):
     u_error[1:nx-1,j] = [abs(u_analytical(xs[i],j*k) - u[i,j])/u_analytical(xs[i],j*k) for i in range(1,nx-1)]
 
+'''
+
+# Tutorial Sheet 13 2b)
+
+'''
+A = np.array([[6,-1,0,-1],
+              [-1,6,-1,0],
+              [0,-1,6,-1],
+              [-1,0,-1,6]])
+
+s = np.array([[2*(-0.5625+0.5625)],
+              [2*(8.4375+5.0625)],
+              [2*(3.9375-3.9375)],
+              [2*(-8.4375-5.0625)]])
+
+u = np.matmul(np.linalg.inv(A),s)
+
+print(u)
+'''
+
+
+
+# Tutorial Sheet 17 1.e) Numerical Root Finding Methods
+'''
+x = smp.symbols('x')
+
+f = pi*x**2*(6-x)/3 - 25
+
+f1 = smp.diff(f,x)
+f2 = smp.diff(f,x)
+
+n = 20
+x0 = 3.98
+
+# Newton Raphson Method
+xn = np.zeros(n)   # iterations of xn
+epsilon = np.zeros(n)   # relative error = 100% * (xnew - xold)/xnew
+
+xn[0] = x0
+for i in range(1,n):
+    xn[i] = xn[i-1] - f.evalf(subs={x:xn[i-1]})/f1.evalf(subs={x:xn[i-1]})
+    epsilon[i] = 100*(xn[i] - xn[i-1])/xn[i]
+
+#print("NR method: iterations: ", xn)
+#print("NR method: relative errors: ", epsilon)
+
+
+#Secant Method
+xn = np.zeros(n)   # iterations of xn
+epsilon = np.zeros(n)   # relative error = 100% * (xnew - xold)/xnew
+
+n = 7
+
+x0 = 2
+x1 = 6
+
+xn[0] = x0
+xn[1] = x1
+
+for i in range(2,n):
+    xn[i] = xn[i-1] - f.evalf(subs={x:xn[i-1]})*(xn[i-2]-xn[i-1])/(f.evalf(subs={x:xn[i-2]})-f.evalf(subs={x:xn[i-1]}))
+    epsilon[i] = 100*(xn[i] - xn[i-1])/xn[i]
+
+#print("Secant method: iterations: ", xn)
+#print("Secant method: relative errors: ", epsilon)
+'''
+
+# Tutorial Sheet 17 3
+'''
+x = smp.symbols('x')
+f = x**3 - 2*x**2 - 4*x + 8
+
+f1 = smp.diff(f,x)
+
+n = 20
+x0 = 1.2
+
+# Newton Raphson Method
+xn = np.zeros(n)   # iterations of xn
+epsilon = np.zeros(n)   # relative error = 100% * (xnew - xold)/xnew
+
+xn[0] = x0
+for i in range(1,n):
+    xn[i] = xn[i-1] - f.evalf(subs={x:xn[i-1]})/f1.evalf(subs={x:xn[i-1]})
+    epsilon[i] = 100*(xn[i] - xn[i-1])/xn[i]
+
+#print("NR method: iterations: ", xn)
+#print("NR method: relative errors: ", epsilon)
+'''
+
+# Newton Raphson Method with known multiplicity m = 2
+''''
+x = smp.symbols('x')
+f = x**3 - 2*x**2 - 4*x + 8
+
+f1 = smp.diff(f,x)
+
+n = 10
+x0 = 1.2
+
+xn = np.zeros(n)   # iterations of xn
+epsilon = np.ones(n)   # relative error = 100% * (xnew - xold)/xnew
+m = 2
+
+xn[0] = x0
+
+for i in range(1,n):
+    if abs(epsilon[i-1]) > 10**(-10):
+        xn[i] = xn[i-1] - m*f.evalf(subs={x:xn[i-1]})/f1.evalf(subs={x:xn[i-1]})
+        epsilon[i] = 100*(xn[i] - xn[i-1])/xn[i]
+    else:
+        xn[i] = xn[i-1]
+        epsilon[i] = 0
+
+print("NR method multiplicity modified: iterations: ", xn)
+print("NR method multiplicity modified: relative errors: ", epsilon)
+'''
+
+
+# Modified NR method
+'''
+x = smp.symbols('x')
+f = x**3 - 2*x**2 - 4*x + 8
+
+f1 = smp.diff(f,x)
+f2 = smp.diff(f1,x)
+
+n = 10
+x0 = 1.2
+
+xn = np.zeros(n)   # iterations of xn
+epsilon = np.ones(n)   # relative error = 100% * (xnew - xold)/xnew
+m = 2
+
+xn[0] = x0
+
+for i in range(1,n):
+    if abs(epsilon[i-1]) > 10**(-10):
+        denom = f1.evalf(subs={x:xn[i-1]})**2 - f.evalf(subs={x:xn[i-1]})*f2.evalf(subs={x:xn[i-1]})
+        xn[i] = xn[i-1] - f.evalf(subs={x:xn[i-1]})*f1.evalf(subs={x:xn[i-1]})/denom
+        epsilon[i] = 100*(xn[i] - xn[i-1])/xn[i]
+    else:
+        xn[i] = xn[i-1]
+        epsilon[i] = 0
+
+print("NR method multiplicity modified: iterations: ", xn)
+print("NR method multiplicity modified: relative errors: ", epsilon)
+'''
+
+# NR method for system of nonlinear equations
+
+x, y = smp.symbols('x'), smp.symbols('y')
+
+u = x**2 + y**2 - 16
+v = (x-4)**2 + (y-4)**2 - 8
+
+n = 10
+
+x0 = 4
+y0 = 0
+
+xn = np.zeros(n)   # iterations of xn
+yn = np.zeros(n)
+
+epsilonx = np.ones(n)
+epsilony = np.ones(n)
+
+xn[0] = x0
+yn[0] = y0
+
+
+for i in range(n-1):
+    Jn = np.ndarray((2,2))
+    Jn[0,0] = smp.diff(u,x).evalf(subs={x:xn[i], y:yn[i]})
+    Jn[0,1] = smp.diff(u,y).evalf(subs={x:xn[i], y:yn[i]})
+    Jn[1,0] = smp.diff(v,x).evalf(subs={x:xn[i], y:yn[i]})
+    Jn[1,1] = smp.diff(v,y).evalf(subs={x:xn[i], y:yn[i]})
+
+    Jninv = np.linalg.inv(Jn)
+
+    Xn = np.array([[xn[i]],[yn[i]]])
+    Fn = np.array([[u.evalf(subs={x:xn[i], y:yn[i]})],[v.evalf(subs={x:xn[i], y:yn[i]})]])
+
+    Xnp1 = Xn - np.matmul(Jninv,Fn)
+
+    xn[i+1] = Xnp1[0,0]
+    yn[i+1] = Xnp1[1,0]
+
+    epsilonx[i+1] = 100*(xn[i+1] - xn[i])/xn[i+1]
+    epsilony[i+1] = 100*(yn[i+1] - yn[i])/yn[i+1]
+
+    print(f"iteration {i+1}, xn = {xn[i+1]}, yn = {yn[i+1]}")
+    #, x rel er = {epsilonx[i+1]}%, y rel er = {epsilony[i+1]}%
