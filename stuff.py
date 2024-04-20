@@ -369,7 +369,7 @@ print("NR method multiplicity modified: relative errors: ", epsilon)
 '''
 
 # NR method for system of nonlinear equations
-
+'''
 x, y = smp.symbols('x'), smp.symbols('y')
 
 u = x**2 + y**2 - 16
@@ -412,3 +412,83 @@ for i in range(n-1):
 
     print(f"iteration {i+1}, xn = {xn[i+1]}, yn = {yn[i+1]}")
     #, x rel er = {epsilonx[i+1]}%, y rel er = {epsilony[i+1]}%
+'''
+
+# Tutorial Sheet 18 2 Golden search method
+'''
+def f(x):
+    return (-2*x)*exp(-x**2)
+
+x = [0,1]
+
+n = 20
+R = 0.5*(sqrt(5)-1)
+
+x1 = x[0] + R*(x[1]-x[0])
+x2 = x[1] - R*(x[1]-x[0])
+
+print(x)
+
+for i in range(1,n):
+    x1o = x1
+    x2o = x2
+    if f(x1) < f(x2):
+        x = [x2, x[1]]
+        x1 = x[0] + R*(x[1]-x[0])
+        x2 = x1o
+    else:
+        x = [x[0], x2]
+        x1 = x2o
+        x2 = x[0] - R*(x[1]-x[0])
+    print(x)
+
+'''
+
+# Tutorial Sheet 18 3 Steepest Ascent/descent Method
+
+x, y, h = smp.symbols('x'), smp.symbols('y'), smp.symbols('h')
+
+mode = 1 # 1 for ascent, -1 for descent - this doesn't really change the calculation, but this makes sure h always comes out as positive (i.e. moving along the direction of steepest ascent or descent)
+
+f = (x-3)**2 + (y-2)**2
+#4*(x-1)*y - 2*(x-1)**2 - 4*y**2 #
+
+xi, yi = 1,1
+
+n = 50
+
+print(xi, ", ", yi)
+
+for i in range(1,n):
+    Nablaf = np.array([smp.diff(f,x).evalf(subs={x:xi,y:yi}),smp.diff(f,y).evalf(subs={x:xi,y:yi})])
+
+    xc = xi + mode*h*Nablaf[0]
+    yc = yi + mode*h*Nablaf[1]
+
+    g = f.evalf(subs={x:xc,y:yc})
+    hm = smp.solve(smp.diff(g,h), h, dict=True)[0][h]   # huh dictionaries can have non-integer indexes (keys) - could be useful h
+
+    xi = xc.evalf(subs={h:hm})
+    yi = yc.evalf(subs={h:hm})
+
+    Dfx = smp.diff(f,x).evalf(subs={x:xi,y:yi})
+    Dfy = smp.diff(f,y).evalf(subs={x:xi,y:yi})
+    A = smp.diff(f,x,x).evalf(subs={x:xi,y:yi})
+    B = smp.diff(f,x,y).evalf(subs={x:xi,y:yi})
+    C = smp.diff(f,y,y).evalf(subs={x:xi,y:yi})
+    hessianDet = A*C - B**2
+
+    if abs(Dfx) < 10**(-5) and abs(Dfy) < 10**(-5):
+        if A < 0 and hessianDet > 0:
+            xf = xi
+            yf = yi
+            print(xf, ", ", yf)
+            print(f"maximum reached, iteration {i}")
+            break
+        elif A > 0:
+            xf = xi
+            yf = yi
+            print(xf, ", ", yf)
+            print(f"minimum reached, iteration {i}")
+            break
+    print(xi, ", ", yi)
