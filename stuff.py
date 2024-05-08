@@ -444,6 +444,8 @@ for i in range(1,n):
 
 '''
 
+'''
+
 # Tutorial Sheet 18 3 Steepest Ascent/descent Method
 
 x, y, h = smp.symbols('x'), smp.symbols('y'), smp.symbols('h')
@@ -492,3 +494,42 @@ for i in range(1,n):
             print(f"minimum reached, iteration {i}")
             break
     print(xi, ", ", yi)
+
+'''
+
+# Tutorial Sheet 8 
+
+ni = 20 #no of iterations
+no = 5 #no of nodes
+
+h = 0.1/(no-1)
+m = sqrt(800.)
+
+thetas = np.ndarray((ni,no))
+
+thetas[0,:] = [200. for i in range(no)]
+thetas[:,0] = [250. for i in range(ni)]
+thetas[:,-1] = [150. for i in range(ni)]
+
+for k in range(ni-1):
+    for n in range(1,no-1):
+        thetas[k+1,n] = (thetas[k,n+1]+thetas[k+1,n-1])/(h**2*m**2 + 2)
+
+#print(thetas)
+#print(thetas[-1,int((no-1)/2)])
+
+A = np.array([[10**5,0,0,0,0],
+                [8.994,-18.238,9.281,0,0],
+                [0,9.625,-19.588,9.975,0],
+                [0,0,10.331,-21.013,10.694],
+                [0,0,0,0,10**5]])
+
+Ainv = np.linalg.inv(A*10**(-5))
+
+d = np.array([[0.1056*10**(-6)],
+                [0],
+                [0],
+                [0],
+                [0.1038*10**(-6)]])
+
+print(np.matmul(Ainv,d))
